@@ -102,6 +102,7 @@ def _user_management():
                         sheets_db.get_all_records.clear()
                         log_activity("edit_user", f"Edit user: {selected}")
                         st.success(f"User '{selected}' berhasil diupdate!")
+                        st.rerun()
 
 
 def _general_settings():

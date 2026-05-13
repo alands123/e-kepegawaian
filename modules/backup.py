@@ -101,6 +101,7 @@ def _restore_section():
                 log_activity("restore", f"Restore {len(sheets)} sheet")
                 st.success("Restore berhasil!")
                 st.balloons()
+                st.rerun()
 
         except json.JSONDecodeError:
             st.error("File tidak valid. Upload file .json backup.")
