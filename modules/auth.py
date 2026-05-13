@@ -4,20 +4,9 @@ auth.py — Authentication & Authorization
 
 import streamlit as st
 import hashlib
-import extra_streamlit_components as stx
 from datetime import datetime, timedelta
 from modules import sheets_db
 from modules.utils import generate_id, now_str, hash_password_simple, verify_password_simple
-
-
-# ---------------------------------------------------------------------------
-# Cookie Manager
-# ---------------------------------------------------------------------------
-
-def get_cookie_manager():
-    if "cookie_manager" not in st.session_state:
-        st.session_state.cookie_manager = stx.CookieManager()
-    return st.session_state.cookie_manager
 
 
 # ---------------------------------------------------------------------------
@@ -115,10 +104,8 @@ def login_user(user: dict):
 
 
 def logout_user():
-    keys_to_keep = ["cookie_manager"]
     for key in list(st.session_state.keys()):
-        if key not in keys_to_keep:
-            del st.session_state[key]
+        del st.session_state[key]
     st.session_state["authenticated"] = False
 
 
