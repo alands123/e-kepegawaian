@@ -34,6 +34,9 @@ def get_gspread_client():
                 if "-----BEGIN" not in pk:
                     pk = "-----BEGIN PRIVATE KEY-----\n" + pk + "\n-----END PRIVATE KEY-----"
                 creds_dict["private_key"] = pk
+        elif "GCP_SERVICE_ACCOUNT_JSON" in st.secrets:
+            # HuggingFace: entire JSON stored as single secret
+            creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT_JSON"])
         else:
             raw_key = st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY", "")
             # Handle both literal \n and actual newlines
