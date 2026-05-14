@@ -28,12 +28,24 @@ def get_gspread_client():
         # Support both nested (secrets.toml) and flat (HuggingFace) formats
         if "gcp_service_account" in st.secrets:
             creds_dict = dict(st.secrets["gcp_service_account"])
+            # Fix private key newlines if needed
+            if "private_key" in creds_dict:
+                pk = creds_dict["private_key"].replace("\\n", "\n")
+                if "-----BEGIN" not in pk:
+                    pk = "-----BEGIN PRIVATE KEY-----\n" + pk + "\n-----END PRIVATE KEY-----"
+                creds_dict["private_key"] = pk
         else:
+            raw_key = st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY", "")
+            # Handle both literal \n and actual newlines
+            private_key = raw_key.replace("\\n", "\n")
+            # Ensure proper PEM format
+            if private_key and "-----BEGIN" not in private_key:
+                private_key = "-----BEGIN PRIVATE KEY-----\n" + private_key.strip() + "\n-----END PRIVATE KEY-----"
             creds_dict = {
                 "type": st.secrets.get("GCP_SERVICE_ACCOUNT_TYPE", "service_account"),
                 "project_id": st.secrets.get("GCP_SERVICE_ACCOUNT_PROJECT_ID", ""),
                 "private_key_id": st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY_ID", ""),
-                "private_key": st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY", "").replace("\\n", "\n"),
+                "private_key": private_key,
                 "client_email": st.secrets.get("GCP_SERVICE_ACCOUNT_CLIENT_EMAIL", ""),
                 "client_id": st.secrets.get("GCP_SERVICE_ACCOUNT_CLIENT_ID", ""),
                 "auth_uri": st.secrets.get("GCP_SERVICE_ACCOUNT_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
