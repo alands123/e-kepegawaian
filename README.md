@@ -1,5 +1,15 @@
-markdown
-markdown
+---
+title: e-Kepegawaian
+emoji: 🏛️
+colorFrom: indigo
+colorTo: yellow
+sdk: streamlit
+sdk_version: 1.45.0
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # 🏛️ e-Kepegawaian
 
 **Sistem Arsip & Manajemen Data Kepegawaian** berbasis web untuk instansi
@@ -26,13 +36,12 @@ pemerintah, sekolah, dan dinas.
 - **Auth:** Custom bcrypt + session management
 - **Document:** python-docx / docxtpl
 - **Charts:** Plotly
-- **Deploy:** Streamlit Community Cloud (GRATIS)
 
 ## Instalasi Lokal
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/username/e-kepegawaian.git
+git clone https://github.com/alands123/e-kepegawaian.git
 cd e-kepegawaian
 
 # 2. Buat virtual environment
@@ -49,40 +58,61 @@ cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 
 # 5. Jalankan aplikasi
 streamlit run app.py
+```
 
-Setup Google Sheets API
+## Deploy ke HuggingFace Spaces (GRATIS)
 
-1.Buka 
-Google Cloud Console
-2.Buat project baru
-3.Aktifkan Google Sheets API dan Google Drive API
-4.Buat Service Account → Download JSON credential
-5.Buat Google Spreadsheet bernama "e-Kepegawaian Database"
-6.Share spreadsheet ke email service account (Editor access)
-7.Copy isi JSON ke .streamlit/secrets.toml
+### Langkah 1 — Buat Space
 
-Deploy ke Streamlit Cloud
+1. Buka [huggingface.co/new-space](https://huggingface.co/new-space)
+2. Isi:
+   - **Space name:** `e-kepegawaian`
+   - **License:** MIT
+   - **SDK:** Streamlit
+   - **Visibility:** Private ⚠️ (karena ada data pegawai & credentials)
+3. Klik **Create Space**
 
-1.Push kode ke GitHub
-2.Login ke 
-Streamlit Cloud
-3.Klik New app → Pilih repository
-4.Set main file: app.py
-5.Klik Advanced settings → Paste isi secrets.toml
-6.Klik Deploy
+### Langkah 2 — Push kode
 
-Default Login
+```bash
+# Tambah remote HuggingFace
+git remote add hf https://huggingface.co/spaces/NAMA_KAMU/e-kepegawaian
 
-Username	Password	Role
-admin	Admin@2026	admin
+# Push ke HuggingFace
+git push hf main
+```
+
+### Langkah 3 — Setup Secrets
+
+Buka **Settings** di Space kamu → **Repository secrets**, lalu tambahkan:
+
+| Nama Secret | Isi |
+|---|---|
+| `GCP_SERVICE_ACCOUNT_TYPE` | `service_account` |
+| `GCP_SERVICE_ACCOUNT_PROJECT_ID` | project ID dari GCP |
+| `GCP_SERVICE_ACCOUNT_PRIVATE_KEY_ID` | dari file JSON |
+| `GCP_SERVICE_ACCOUNT_PRIVATE_KEY` | isi private key (termasuk BEGIN/END) |
+| `GCP_SERVICE_ACCOUNT_CLIENT_EMAIL` | email service account |
+| `GCP_SERVICE_ACCOUNT_CLIENT_ID` | client ID |
+| `GCP_SERVICE_ACCOUNT_AUTH_URI` | `https://accounts.google.com/o/oauth2/auth` |
+| `GCP_SERVICE_ACCOUNT_TOKEN_URI` | `https://oauth2.googleapis.com/token` |
+| `GCP_SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL` | `https://www.googleapis.com/oauth2/v1/certs` |
+| `GCP_SERVICE_ACCOUNT_CLIENT_X509_CERT_URL` | dari file JSON |
+| `APP_SPREADSHEET_NAME` | `e-Kepegawaian Database` |
+| `APP_DEFAULT_ADMIN_PASSWORD` | `Admin@2026` |
+| `AUTH_COOKIE_KEY` | random string 32+ karakter |
+
+## Default Login
+
+| Username | Password | Role |
+|---|---|---|
+| admin | Admin@2026 | admin |
 
 ⚠️ Segera ganti password setelah login pertama kali!
 
+## Struktur Folder
 
-Struktur Folder
-
-text
-text
+```
 e-kepegawaian/
 ├── app.py              # Entry point
 ├── requirements.txt    # Dependencies
@@ -102,83 +132,8 @@ e-kepegawaian/
     ├── backup.py       # Backup & restore
     ├── settings.py     # Pengaturan
     └── utils.py        # Utilities
+```
 
-Lisensi
+## Lisensi
 
 MIT License — Bebas digunakan dan dikembangkan.
-
-text
-text
-
----
-
-## Panduan Deployment Lengkap
-
-### Langkah 1 — Google Cloud Console
-
-1.Buka console.cloud.google.com
-2.Buat Project baru → "e-Kepegawaian"
-3.Menu: APIs & Services → Enable API
-Google Sheets API → Enable
-Google Drive API → Enable
-4.Menu: IAM & Admin → Service Accounts → Create
-Name: ekepeg-service
-Role: Editor
-Create Key → JSON → Download
-5.Salin isi file JSON ke secrets.toml
-text
-text
-
-### Langkah 2 — Google Spreadsheet
-
-1.Buka sheets.google.com
-2.Buat Spreadsheet baru → Nama: "e-Kepegawaian Database"
-3.Klik Share → Tambahkan email service account
-(format: 
-xxxxx@project-id.iam.gserviceaccount.com
-)
-4.Beri akses "Editor"
-5.Sheet akan otomatis terisi tab saat app pertama dijalankan
-text
-text
-
-### Langkah 3 — GitHub
-
-```bash
-mkdir e-kepegawaian && cd e-kepegawaian
-git init
-
-# (copy semua file ke struktur folder yang sesuai)
-
-git add .
-git commit -m "Initial commit: e-Kepegawaian v1.0"
-git branch -M main
-git remote add origin https://github.com/USERNAME/e-kepegawaian.git
-git push -u origin main
-
-Langkah 4 — Streamlit Cloud
-
-text
-text
-1. Buka share.streamlit.io
-2. Login dengan GitHub
-3. Klik "New app"
-4. Repository: USERNAME/e-kepegawaian
-5. Branch: main
-6. Main file: app.py
-7. Klik "Advanced settings"
-8. Paste isi secrets.toml ke kolom Secrets
-9. Klik "Deploy!"
-
-Langkah 5 — Verifikasi
-
-text
-text
-1. Tunggu deployment selesai (~2-5 menit)
-2. Aplikasi terbuka di URL: https://xxx.streamlit.app
-3. Login dengan: admin / Admin@2026
-4. Test semua menu
-5. Ganti password admin di Pengaturan
-
-
-Semua kode di atas saling terintegrasi dan siap deploy. Setiap modul memiliki error handling, input validation, dan audit logging. UI menggunakan tema pemerintah profesional dengan warna navy, kartu modern, dan responsif untuk mobile. Aplikasi ini gratis di-deploy di Streamlit Community Cloud tanpa biaya server.

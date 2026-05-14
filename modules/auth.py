@@ -77,7 +77,12 @@ def init_default_admin():
     """Create default admin if no users exist."""
     users = sheets_db.get_all_records("users")
     if not users:
-        default_pw = st.secrets.get("app", {}).get("default_admin_password", "Admin@2026")
+        # Support both nested (secrets.toml) and flat (HuggingFace) formats
+        app_secrets = st.secrets.get("app", {})
+        if isinstance(app_secrets, dict) and app_secrets:
+            default_pw = app_secrets.get("default_admin_password", "Admin@2026")
+        else:
+            default_pw = st.secrets.get("APP_DEFAULT_ADMIN_PASSWORD", "Admin@2026")
         create_user(
             username="admin",
             password=default_pw,

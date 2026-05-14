@@ -24,7 +24,24 @@ def get_gspread_client():
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive",
         ]
-        creds_dict = dict(st.secrets["gcp_service_account"])
+
+        # Support both nested (secrets.toml) and flat (HuggingFace) formats
+        if "gcp_service_account" in st.secrets:
+            creds_dict = dict(st.secrets["gcp_service_account"])
+        else:
+            creds_dict = {
+                "type": st.secrets.get("GCP_SERVICE_ACCOUNT_TYPE", "service_account"),
+                "project_id": st.secrets.get("GCP_SERVICE_ACCOUNT_PROJECT_ID", ""),
+                "private_key_id": st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY_ID", ""),
+                "private_key": st.secrets.get("GCP_SERVICE_ACCOUNT_PRIVATE_KEY", "").replace("\\n", "\n"),
+                "client_email": st.secrets.get("GCP_SERVICE_ACCOUNT_CLIENT_EMAIL", ""),
+                "client_id": st.secrets.get("GCP_SERVICE_ACCOUNT_CLIENT_ID", ""),
+                "auth_uri": st.secrets.get("GCP_SERVICE_ACCOUNT_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
+                "token_uri": st.secrets.get("GCP_SERVICE_ACCOUNT_TOKEN_URI", "https://oauth2.googleapis.com/token"),
+                "auth_provider_x509_cert_url": st.secrets.get("GCP_SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs"),
+                "client_x509_cert_url": st.secrets.get("GCP_SERVICE_ACCOUNT_CLIENT_X509_CERT_URL", ""),
+            }
+
         creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         return gspread.authorize(creds)
     except Exception as e:
@@ -35,7 +52,12 @@ def get_gspread_client():
 def get_spreadsheet():
     """Return the main spreadsheet object."""
     client = get_gspread_client()
-    name = st.secrets.get("app", {}).get("spreadsheet_name", "e-Kepegawaian Database")
+    # Support both nested and flat formats
+    app_secrets = st.secrets.get("app", {})
+    if isinstance(app_secrets, dict) and app_secrets:
+        name = app_secrets.get("spreadsheet_name", "e-Kepegawaian Database")
+    else:
+        name = st.secrets.get("APP_SPREADSHEET_NAME", "e-Kepegawaian Database")
     try:
         return client.open(name)
     except gspread.SpreadsheetNotFound:
