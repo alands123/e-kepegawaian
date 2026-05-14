@@ -3,7 +3,7 @@ gspread==6.2.1
 google-auth==2.40.1
 google-auth-oauthlib==1.2.1
 pandas==2.2.3
-numpy==2.2.6
+numpy>=1.26.0,<3.0.0
 python-docx==1.1.2
 plotly==6.0.1
 bcrypt==4.3.0

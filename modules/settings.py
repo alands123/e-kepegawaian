@@ -34,7 +34,7 @@ def _user_management():
     # List users
     users = sheets_db.get_all_records("users")
     if users:
-        import pandas as pd
+        import pandas as pd  # noqa: E401
         df = pd.DataFrame(users)
         display_cols = [c for c in ["username", "fullname", "role", "email", "active", "last_login"]
                         if c in df.columns]
@@ -98,7 +98,8 @@ def _user_management():
                         }
                         if new_password:
                             updates["password"] = new_password
-                        sheets_db.update_record("users", user["id"], updates)
+                        from modules.auth import update_user
+                        update_user(user["id"], updates)
                         sheets_db.get_all_records.clear()
                         log_activity("edit_user", f"Edit user: {selected}")
                         st.success(f"User '{selected}' berhasil diupdate!")

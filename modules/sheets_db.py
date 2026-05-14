@@ -203,14 +203,25 @@ def get_setting(key: str, default: str = "") -> str:
 
 
 def set_setting(key: str, value: str, description: str = ""):
-    """Set an application setting (upsert)."""
-    existing = find_one_by_field("settings", "key", key)
+    """Set an application setting (upsert). Works without 'id' column."""
+    ws = _get_or_create_sheet("settings")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    if existing:
-        update_record("settings", existing["id"], {
-            "value": value, "description": description, "updated_at": now,
-        })
-    else:
-        add_record("settings", {
-            "key": key, "value": value, "description": description, "updated_at": now,
-        })
+
+    # Find existing row by key column (settings sheet has no 'id' column)
+    records = ws.get_all_records()
+    for idx, rec in enumerate(records):
+        if str(rec.get("key", "")) == str(key):
+            row_num = idx + 2  # 1-indexed + header row
+            headers = SHEET_HEADERS.get("settings", [])
+            updates = {"value": value, "description": description, "updated_at": now}
+            for k, val in updates.items():
+                if k in headers:
+                    col_idx = headers.index(k) + 1
+                    ws.update_cell(row_num, col_idx, str(val))
+            get_all_records.clear()
+            return
+
+    # Not found — insert new row
+    add_record("settings", {
+        "key": key, "value": value, "description": description, "updated_at": now,
+    })
