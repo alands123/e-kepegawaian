@@ -11,4 +11,4 @@ streamlit-option-menu==0.4.0
 openpyxl==3.1.5
 XlsxWriter==3.2.3
 python-dateutil==2.9.0
-lxml==5.3.2
+
